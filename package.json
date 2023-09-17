@@ -1,0 +1,8 @@
+{
+    "name": "compose-ladybird",
+    "prettier": "@nordcom/prettier",
+    "dependencies": {
+        "@nordcom/prettier": "0.1.1",
+        "prettier": "3.0.3"
+    }
+}
