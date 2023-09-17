@@ -1,14 +1,16 @@
-name: Lint, test, and build.
+name: Lint, test and build
 
 on: [push, pull_request_target]
 
 jobs:
-    lint_test_build:
-        name: Lint, test, and build.
+    lint_and_test:
+        name: Lint and test
         runs-on: ubuntu-latest
         steps:
             - name: 🕶️ Checkout repository
               uses: actions/checkout@v4
+              with:
+                submodules: 'true'
 
             - name: 🏎️ Setup Java 20
               uses: actions/setup-java@v3
@@ -23,10 +25,31 @@ jobs:
             - name: 🧪 Test
               run: ./gradlew test --no-daemon
 
+    build:
+        needs: [lint_and_test]
+        name: Build
+        runs-on: ubuntu-latest
+        continue-on-error: true
+        steps:
+            - name: 🕶️ Checkout repository
+              uses: actions/checkout@v4
+              with:
+                submodules: 'true'
+
+            - name: 🏎️ Setup Java 20
+              uses: actions/setup-java@v3
+              with:
+                  distribution: temurin
+                  java-version: 20
+                  cache: gradle
+
+            - name: 🗄️ Install Dependencies
+              run: sudo apt install -y build-essential cmake libgl1-mesa-dev ninja-build qt6-base-dev qt6-tools-dev-tools qt6-multimedia-dev ccache
+
             - name: 🛠️ Build 
               run: ./gradlew :app:assembleDebug --no-daemon
 
-            - name: 📦 Upload Debug APK to GitHub
+            - name: 📦 Upload Artifact
               uses: actions/upload-artifact@v3
               with:
                   name: parrot-debug.apk
